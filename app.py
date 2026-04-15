@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
+CORS(app)  # 🔥 VERY IMPORTANT (fixes Loveable issue)
 
-# ✅ Home route (for testing)
+# ✅ Home route
 @app.route("/")
 def home():
     return "API is running ✅"
@@ -27,11 +29,10 @@ def search():
     for uid, user in db.get("users", {}).items():
         uname = str(user.get("username", "")).lower().strip()
 
-        # 🔥 partial + case-insensitive search
         if username in uname:
             results.append(user)
 
-    return jsonify(results)  # ✅ ALWAYS return list
+    return jsonify(results)  # 🔥 ALWAYS LIST
 
 # 🚀 Run server
 if __name__ == "__main__":
