@@ -3,19 +3,32 @@ import json
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "API is running ✅"
+
 @app.route("/search")
 def search():
-    username = request.args.get("username")
+    username = request.args.get("username", "").lower().strip()
 
-    with open("database.json") as f:
-        db = json.load(f)
+    if not username:
+        return jsonify([])
 
-    results = []
+    try:
+        with open("database.json", "r") as f:
+            db = json.load(f)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
-    for uid, user in db["users"].items():
-        if username.lower() in str(user.get("username", "")).lower():
-            results.append(user)
+    # 🔥 FAST SEARCH (stops early)
+    for uid, user in db.get("users", {}).items():
+        uname = str(user.get("username", "")).lower().strip()
 
-    return jsonify(results)
+        if username in uname:
+            return jsonify(user)  # return first match instantly
 
-app.run(host="0.0.0.0", port=5000)
+    return jsonify([])
+
+# 🔥 VERY IMPORTANT
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
