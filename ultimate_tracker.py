@@ -85,7 +85,7 @@ def run():
     while True:
         print("\n🔥 FULL SCAN STARTED")
 
-        url = "https://api.imvu.com/room_list/room_list-389766535-explore/rooms?limit=20"
+        url = "https://api.imvu.com/room/room-0/rooms?limit=20""
 
         while url:
             res = requests.get(url, headers=HEADERS)
