@@ -1,16 +1,20 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import json
+import requests
 
 app = Flask(__name__)
 
-# 🔥 FIX CORS PROPERLY
+# ✅ Fix CORS (IMPORTANT)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# ✅ Home route
 @app.route("/")
 def home():
     return "API is running ✅"
 
+
+# 🔍 SEARCH USER
 @app.route("/search")
 def search():
     username = request.args.get("username", "").lower().strip()
@@ -34,5 +38,31 @@ def search():
 
     return jsonify(results)
 
+
+# 🖼️ IMAGE PROXY (FIXES IMVU IMAGE BLOCK)
+@app.route("/image")
+def image_proxy():
+    url = request.args.get("url")
+
+    if not url:
+        return "No URL", 400
+
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+
+        r = requests.get(url, headers=headers, stream=True, timeout=10)
+
+        return Response(
+            r.content,
+            content_type=r.headers.get("Content-Type", "image/jpeg")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
+
+# 🚀 RUN SERVER
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
