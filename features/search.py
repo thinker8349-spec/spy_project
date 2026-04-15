@@ -1,15 +1,23 @@
+from flask import Flask, request, jsonify
 import json
 
-def search_user(username):
-    with open("database.json") as f:
-        db = json.load(f)
+app = Flask(__name__)
 
-    username = username.lower()
+@app.route("/search")
+def search():
+    username = request.args.get("username", "").lower().strip()
 
-    results = []
+    try:
+        with open("database.json", "r") as f:
+            db = json.load(f)
+    except:
+        return jsonify({"error": "DB not found"})
 
-    for uid, user in db["users"].items():
-        if username in str(user.get("username", "")).lower():
-            results.append((uid, user))
+    for uid, user in db.get("users", {}).items():
+        uname = str(user.get("username", "")).lower().strip()
 
-    return results
+        # 🔥 exact match (fast)
+        if uname == username:
+            return jsonify(user)
+
+    return jsonify([])
