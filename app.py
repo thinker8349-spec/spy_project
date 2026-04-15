@@ -3,14 +3,14 @@ from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-CORS(app)  # 🔥 VERY IMPORTANT (fixes Loveable issue)
 
-# ✅ Home route
+# 🔥 FIX CORS PROPERLY
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 @app.route("/")
 def home():
     return "API is running ✅"
 
-# 🔍 Search route
 @app.route("/search")
 def search():
     username = request.args.get("username", "").lower().strip()
@@ -32,8 +32,7 @@ def search():
         if username in uname:
             results.append(user)
 
-    return jsonify(results)  # 🔥 ALWAYS LIST
+    return jsonify(results)
 
-# 🚀 Run server
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
